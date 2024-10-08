@@ -1,47 +1,57 @@
-#include <iostream> // для работы с консольным вводом и выводом
-#include <fstream>  // для работы с файловыми потоками
-#include <string>   // для работы с объектами типа std::string
-#include <unistd.h> // для системных вызовов POSIX, таких как dup2()
-#include <fcntl.h>  // для операций с файловыми дескрипторами, таких как open()
-#include <cerrno>   // для получения номера последней ошибки
-#include <cstring>  // для работы со строками C, таких как strerror()
+#include <iostream>
+#include <fstream> 
+#include <unistd.h> // Для dup2 и STDIN_FILENO
+#include <fcntl.h>  // Для open
+#include <cerrno>   // Для errno
+#include <cstring>  // Для strerror
 
-void initil(int argc, char **argv)
+// функция инициализации перенаправления ввода
+void initialize(int argc, char **argv)
 {
+  // проверяем количество аргументов, чтобы убедиться, что передан файл
   if (argc != 2)
   {
-    std::cerr << "usege:" << argv[0] << "<input-file>" << std::endl;
-    exit(EXIT_FAILURE);
+    // выводим сообщение об использовании программы
+    std::cerr << "Usage: " << argv[0] << " <input-file>" << std::endl;
+    exit(EXIT_FAILURE); // завершаем программу с ошибкой
   }
 
-  int fd = open(argv[1], O_RDONLY);
-  if (fd == -1)
+  // открываем файл для чтения с помощью системного вызова open
+  int file_fd = open(argv[1], O_RDONLY); // открываем файл в режиме только для чтения
+  if (file_fd == -1)
   {
-    std::cerr << "ERROR ORIGIN FILE: " << strerror(errno) << std::endl;
-    exit(EXIT_FAILURE);
+    // если не удалось открыть файл, выводим сообщение об ошибке
+    std::cerr << "Error opening file: " << strerror(errno) << std::endl;
+    exit(EXIT_FAILURE); // завершаем программу с ошибкой
   }
 
-  if (dup2(fd, STDIN_FILENO) == -1)
+  // перенаправляем стандартный ввод (STDIN_FILENO) на открытый файл
+  if (dup2(file_fd, STDIN_FILENO) == -1)
   {
+    // если dup2 завершился с ошибкой, выводим сообщение об ошибке
     std::cerr << "Error redirecting input: " << strerror(errno) << std::endl;
-    close(fd);
-    exit(EXIT_FAILURE); // программа завершилась с ошибкой.
+    close(file_fd);     // закрываем файловый дескриптор, если произошла ошибка
+    exit(EXIT_FAILURE); // завершаем программу с ошибкой
   }
-  close(fd);
+
+  // закрываем файловый дескриптор, так как он больше не нужен
+  close(file_fd);
 }
 
 int main(int argc, char **argv)
 {
+  // инициализируем программу, перенаправляем ввод на файл
+  initialize(argc, argv);
 
-  initil(argc, argv);
-
+  // читаем строку из стандартного ввода (который теперь перенаправлен на файл)
   std::string input;
-  std::cin >> input;
+  std::cin >> input; // читаем строку из файла через std::cin
 
+  // переворачиваем строку
   std::string reversed(input.rbegin(), input.rend());
 
+  // выводим перевёрнутую строку в консоль
   std::cout << reversed << std::endl;
 
   return 0;
-
 }
