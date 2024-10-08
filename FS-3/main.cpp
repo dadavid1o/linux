@@ -35,25 +35,25 @@ void sec_dellete(const char *file_path)
     }
   }
 
-    close(fd);
+  close(fd);
 
-    if (unlink(file_path) == -1)
-    {
-      perror("ошибка при удалении файла");
-      exit(EXIT_FAILURE);
-    }
-    else
-    {
-      printf("Файл %s успешно удален", file_path);
-    }
-  }
-  int main(int argc, char *argv[])
+  if (unlink(file_path) == -1)
   {
-    if (argc != 2)
-    {
-      fprintf(stderr, "error: %s\n", argv[0]);
-      exit(EXIT_FAILURE);
-    }
-    sec_dellete(argv[1]);
-    return 0;
+    perror("ошибка при удалении файла");
+    exit(EXIT_FAILURE);
   }
+  else
+  {
+    printf("Файл %s успешно удален", file_path);
+  }
+}
+int main(int argc, char *argv[])
+{
+  if (argc != 2)
+  {
+    fprintf(stderr, "error: %s\n", argv[0]);
+    exit(EXIT_FAILURE);
+  }
+  sec_dellete(argv[1]);
+  return 0;
+}
