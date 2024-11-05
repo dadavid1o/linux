@@ -23,8 +23,8 @@ int main(int argc, char *argv[])
   if (cel_fd == -1)
   {
     perror("не удалось создать целевой файл");
-    return 1;
     close(cel_fd);
+    return 1;
   }
 
   char buffer[1024]; // массив символов для хранения данных при чтении
