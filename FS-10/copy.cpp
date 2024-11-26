@@ -14,20 +14,20 @@ int main(int argc, char *argv[])
     if (argc != 3) {
         printUsage();
         std::cerr << "ERROR: Few arguments" << std::endl;
-        exit(1);
+        return 1;
     }
 
     int srcFile = open(argv[1], O_RDONLY);
     if (srcFile == -1) {
         std::cerr << "ERROR: No such source file" << std::endl;
-        exit(1);
+        return 1;
     }
 
     int destFile = open(argv[2], O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     if (destFile == -1) {
         std::cerr << "ERROR: Cannot create destination file" << std::endl;
         close(srcFile);
-        exit(1);
+        return 1;
     }
 
     const size_t bufferSize = 4096;
@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
                         std::cerr << "ERROR: Writing to destination file failed" << std::endl;
                         close(srcFile);
                         close(destFile);
-                        exit(1);
+                        return 1;
                     }
                     dataBytes += bytesWritten; // Увеличиваем счетчик данных
                     totalBytes += bytesWritten;
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
                 std::cerr << "ERROR: Writing to destination file failed" << std::endl;
                 close(srcFile);
                 close(destFile);
-                exit(1);
+                return 1;
             }
             dataBytes += bytesWritten;
             totalBytes += bytesWritten;
