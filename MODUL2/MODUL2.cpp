@@ -5,8 +5,8 @@
 #include <unistd.h>
 
 std::vector<int> buffer;
-pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER; 
-pthread_cond_t cv = PTHREAD_COND_INITIALIZER;   // Условная переменная
+pthread_mutex_t mtx; 
+pthread_cond_t cv;   // Условная переменная
 bool dataReady = false; // Флаг готовности данных
 
 // Генератор
@@ -31,7 +31,7 @@ void* producer(void* arg) {
         pthread_mutex_lock(&mtx);
         buffer = std::move(localBuffer);
         dataReady = true;
-        pthread_cond_signal(&cv); 
+	pthread_cond_signal(&cv);
         pthread_mutex_unlock(&mtx);
     }
     return nullptr;
@@ -61,7 +61,10 @@ void* consumer(void* arg) {
 
 int main() {
     pthread_t producerThread, consumerThread;
-
+    
+    pthread_mutex_init(&mtx, NULL);
+    pthread_cond_init(&cv, NULL);
+	
     pthread_create(&producerThread, nullptr, producer, nullptr);
     pthread_create(&consumerThread, nullptr, consumer, nullptr);
 
